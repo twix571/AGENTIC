@@ -5,8 +5,8 @@ import type { WaveConfigViewModel } from "@/app/view/waveconfig/waveconfig-model
 import { getApi } from "@/app/store/global";
 import { globalStore } from "@/app/store/jotaiStore";
 import { cn } from "@/util/util";
-import { atom, useAtom, useAtomValue } from "jotai";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { atom, useAtomValue } from "jotai";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { base64ToString, stringToBase64 } from "@/util/util";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
@@ -19,19 +19,18 @@ interface ColorInputProps {
 }
 
 const ColorInput = memo(({ label, value, onChange, description }: ColorInputProps) => {
-  const [localValue, setLocalValue] = useAtom(value);
-  const isColorInputMode = useRef<boolean>(true);
+  const [localValue, setLocalValue] = useState(value);
 
+  // Sync local state with prop changes
   useEffect(() => {
     setLocalValue(value);
-  }, [value, setLocalValue]);
+  }, [value]);
 
   const handleColorChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       onChange(newValue);
       setLocalValue(newValue);
-      isColorInputMode.current = false;
     },
     [onChange, setLocalValue]
   );
@@ -45,7 +44,7 @@ const ColorInput = memo(({ label, value, onChange, description }: ColorInputProp
   );
 
   const handleMouseDown = useCallback(() => {
-    isColorInputMode.current = true;
+    // If color input mode is needed, can be handled by parent component
   }, []);
 
   const handleTextBlur = useCallback(
@@ -205,7 +204,24 @@ type ThemeColors = {
   "hover-bg": string;
   border: string;
   "modal-bg": string;
-  "highlight-bg": string;
+  "modal-header-border": string;
+  "modal-border": string;
+  "modal-shadow": string;
+  "modal-radius": string;
+  "form-input-border": string;
+  "form-input-bg": string;
+  "form-input-focus": string;
+  "scrollbar-thumb": string;
+  "scrollbar-track": string;
+  "selection-bg": string;
+  "selection-text": string;
+  "disabled-bg": string;
+  "disabled-text": string;
+  "focus-ring": string;
+  "button-primary": string;
+  "button-primary-hover": string;
+  "button-secondary": string;
+  "button-secondary-hover": string;
 };
 
 const defaultColors: ThemeColors = {
@@ -226,7 +242,24 @@ const defaultColors: ThemeColors = {
   "hover-bg": "rgba(255, 255, 255, 0.2)",
   border: "rgba(255, 255, 255, 0.16)",
   "modal-bg": "#232323",
-  "highlight-bg": "rgba(255, 255, 255, 0.2)",
+  "modal-header-border": "rgba(241, 246, 243, 0.15)",
+  "modal-border": "rgba(255, 255, 255, 0.12)",
+  "modal-shadow": "rgba(0, 0, 0, 0.8)",
+  "modal-radius": "6px",
+  "form-input-border": "rgba(241, 246, 243, 0.15)",
+  "form-input-bg": "rgba(0, 0, 0, 0.3)",
+  "form-input-focus": "rgba(88, 193, 66, 0.5)",
+  "scrollbar-thumb": "rgba(255, 255, 255, 0.3)",
+  "scrollbar-track": "rgba(0, 0, 0, 0.2)",
+  "selection-bg": "rgba(88, 193, 66, 0.3)",
+  "selection-text": "#f7f7f7",
+  "disabled-bg": "rgba(255, 255, 255, 0.05)",
+  "disabled-text": "rgba(255, 255, 255, 0.4)",
+  "focus-ring": "rgba(88, 193, 66, 0.5)",
+  "button-primary": "#f7f7f7",
+  "button-primary-hover": "#e0e0e0",
+  "button-secondary": "rgb(195, 200, 194)",
+  "button-secondary-hover": "rgb(175, 180, 175)",
 };
 
 const colorDescriptions: Record<keyof ThemeColors, string> = {
@@ -248,6 +281,24 @@ const colorDescriptions: Record<keyof ThemeColors, string> = {
   border: "Border and divider color",
   "modal-bg": "Modal/dialog background",
   "highlight-bg": "Highlighted item background",
+  "modal-header-border": "Modal header bottom border",
+  "modal-border": "Modal border",
+  "modal-shadow": "Modal shadow",
+  "modal-radius": "Modal border radius",
+  "form-input-border": "Form input border",
+  "form-input-bg": "Form input background",
+  "form-input-focus": "Form input focus ring",
+  "scrollbar-thumb": "Scrollbar thumb",
+  "scrollbar-track": "Scrollbar track",
+  "selection-bg": "Selection background",
+  "selection-text": "Selection text",
+  "disabled-bg": "Disabled element background",
+  "disabled-text": "Disabled element text",
+  "focus-ring": "Focus ring color",
+  "button-primary": "Primary button background",
+  "button-primary-hover": "Primary button hover background",
+  "button-secondary": "Secondary button background",
+  "button-secondary-hover": "Secondary button hover background",
 };
 
 // Helper function to apply theme colors to CSS variables immediately
@@ -262,11 +313,29 @@ export const applyThemeFromConfig = (themeConfig: ThemeColors) => {
   document.documentElement.style.setProperty("--hover-bg-color", themeConfig["hover-bg"]);
   document.documentElement.style.setProperty("--border-color", themeConfig.border);
   document.documentElement.style.setProperty("--accent-color", themeConfig.accent);
-  document.documentElement.style.setProperty("--form-element-primary-color", themeConfig.accent);
-  document.documentElement.style.setProperty("--toggle-checked-bg-color", themeConfig.accent);
+  document.documentElement.style.setProperty("--accent-hover-color", themeConfig["accent-hover"]);
+  document.documentElement.style.setProperty("--accent-bg-color", themeConfig["accent-bg"]);
   document.documentElement.style.setProperty("--error-color", themeConfig.error);
   document.documentElement.style.setProperty("--warning-color", themeConfig.warning);
   document.documentElement.style.setProperty("--success-color", themeConfig.success);
+  document.documentElement.style.setProperty("--modal-header-border-color", themeConfig["modal-header-border"]);
+  document.documentElement.style.setProperty("--modal-border-color", themeConfig["modal-border"]);
+  document.documentElement.style.setProperty("--modal-shadow-color", themeConfig["modal-shadow"]);
+  document.documentElement.style.setProperty("--modal-border-radius", themeConfig["modal-radius"]);
+  document.documentElement.style.setProperty("--form-element-border-color", themeConfig["form-input-border"]);
+  document.documentElement.style.setProperty("--form-element-bg-color", themeConfig["form-input-bg"]);
+  document.documentElement.style.setProperty("--form-element-focus-color", themeConfig["form-input-focus"]);
+  document.documentElement.style.setProperty("--scrollbar-thumb-color", themeConfig["scrollbar-thumb"]);
+  document.documentElement.style.setProperty("--scrollbar-track-color", themeConfig["scrollbar-track"]);
+  document.documentElement.style.setProperty("--selection-bg-color", themeConfig["selection-bg"]);
+  document.documentElement.style.setProperty("--selection-text-color", themeConfig["selection-text"]);
+  document.documentElement.style.setProperty("--disabled-bg-color", themeConfig["disabled-bg"]);
+  document.documentElement.style.setProperty("--disabled-text-color", themeConfig["disabled-text"]);
+  document.documentElement.style.setProperty("--focus-ring-color", themeConfig["focus-ring"]);
+  document.documentElement.style.setProperty("--button-primary-color", themeConfig["button-primary"]);
+  document.documentElement.style.setProperty("--button-primary-hover-color", themeConfig["button-primary-hover"]);
+  document.documentElement.style.setProperty("--button-secondary-color", themeConfig["button-secondary"]);
+  document.documentElement.style.setProperty("--button-secondary-hover-color", themeConfig["button-secondary-hover"]);
 };
 
 export const ThemeVisualContent = memo(({ model }: ThemeVisualContentProps) => {
@@ -311,11 +380,29 @@ export const ThemeVisualContent = memo(({ model }: ThemeVisualContentProps) => {
     document.documentElement.style.setProperty("--hover-bg-color", colors["hover-bg"]);
     document.documentElement.style.setProperty("--border-color", colors.border);
     document.documentElement.style.setProperty("--accent-color", colors.accent);
-    document.documentElement.style.setProperty("--form-element-primary-color", colors.accent);
-    document.documentElement.style.setProperty("--toggle-checked-bg-color", colors.accent);
+    document.documentElement.style.setProperty("--accent-hover-color", colors["accent-hover"]);
+    document.documentElement.style.setProperty("--accent-bg-color", colors["accent-bg"]);
     document.documentElement.style.setProperty("--error-color", colors.error);
     document.documentElement.style.setProperty("--warning-color", colors.warning);
     document.documentElement.style.setProperty("--success-color", colors.success);
+    document.documentElement.style.setProperty("--modal-header-border-color", colors["modal-header-border"]);
+    document.documentElement.style.setProperty("--modal-border-color", colors["modal-border"]);
+    document.documentElement.style.setProperty("--modal-shadow-color", colors["modal-shadow"]);
+    document.documentElement.style.setProperty("--modal-border-radius", colors["modal-radius"]);
+    document.documentElement.style.setProperty("--form-element-border-color", colors["form-input-border"]);
+    document.documentElement.style.setProperty("--form-element-bg-color", colors["form-input-bg"]);
+    document.documentElement.style.setProperty("--form-element-focus-color", colors["form-input-focus"]);
+    document.documentElement.style.setProperty("--scrollbar-thumb-color", colors["scrollbar-thumb"]);
+    document.documentElement.style.setProperty("--scrollbar-track-color", colors["scrollbar-track"]);
+    document.documentElement.style.setProperty("--selection-bg-color", colors["selection-bg"]);
+    document.documentElement.style.setProperty("--selection-text-color", colors["selection-text"]);
+    document.documentElement.style.setProperty("--disabled-bg-color", colors["disabled-bg"]);
+    document.documentElement.style.setProperty("--disabled-text-color", colors["disabled-text"]);
+    document.documentElement.style.setProperty("--focus-ring-color", colors["focus-ring"]);
+    document.documentElement.style.setProperty("--button-primary-color", colors["button-primary"]);
+    document.documentElement.style.setProperty("--button-primary-hover-color", colors["button-primary-hover"]);
+    document.documentElement.style.setProperty("--button-secondary-color", colors["button-secondary"]);
+    document.documentElement.style.setProperty("--button-secondary-hover-color", colors["button-secondary-hover"]);
   }, []);
 
   const handleColorChange = useCallback(
@@ -353,6 +440,22 @@ export const ThemeVisualContent = memo(({ model }: ThemeVisualContentProps) => {
     {
       title: "UI Elements",
       colors: ["panel", "hover", "hover-bg", "border", "modal-bg", "highlight-bg"] as const,
+    },
+    {
+      title: "Modal & Popups",
+      colors: ["modal-bg", "modal-header-border", "modal-border", "modal-shadow", "modal-radius"] as const,
+    },
+    {
+      title: "Form Elements",
+      colors: ["form-input-border", "form-input-bg", "form-input-focus", "scrollbar-thumb", "scrollbar-track"] as const,
+    },
+    {
+      title: "Interactive States",
+      colors: ["selection-bg", "selection-text", "disabled-bg", "disabled-text", "focus-ring"] as const,
+    },
+    {
+      title: "Buttons",
+      colors: ["button-primary", "button-primary-hover", "button-secondary", "button-secondary-hover"] as const,
     },
   ];
 

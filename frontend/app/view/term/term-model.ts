@@ -1232,21 +1232,10 @@ export class TermViewModel implements ViewModel {
                 },
             ],
         });
-        const debugConn = blockData?.meta?.["term:conndebug"];
+        const debugConn = blockData?.meta?.["term:conndebug"] ?? "info";
         advancedSubmenu.push({
             label: "Debug Connection",
             submenu: [
-                {
-                    label: "Off",
-                    type: "checkbox",
-                    checked: !debugConn,
-                    click: () => {
-                        RpcApi.SetMetaCommand(TabRpcClient, {
-                            oref: WOS.makeORef("block", this.blockId),
-                            meta: { "term:conndebug": null },
-                        });
-                    },
-                },
                 {
                     label: "Info",
                     type: "checkbox",

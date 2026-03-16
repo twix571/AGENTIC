@@ -17,6 +17,24 @@
     "hover-bg": "rgba(255, 255, 255, 0.2)",
     "border": "rgba(255, 255, 255, 0.16)",
     "modal-bg": "#232323",
-    "highlight-bg": "rgba(255, 255, 255, 0.2)"
+    "highlight-bg": "rgba(255, 255, 255, 0.2)",
+    "modal-header-border": "rgba(241, 246, 243, 0.15)",
+    "modal-border": "rgba(255, 255, 255, 0.12)",
+    "modal-shadow": "rgba(0, 0, 0, 0.8)",
+    "modal-radius": "6px",
+    "form-input-border": "rgba(241, 246, 243, 0.15)",
+    "form-input-bg": "rgba(0, 0, 0, 0.3)",
+    "form-input-focus": "rgba(88, 193, 66, 0.5)",
+    "scrollbar-thumb": "rgba(255, 255, 255, 0.3)",
+    "scrollbar-track": "rgba(0, 0, 0, 0.2)",
+    "selection-bg": "rgba(88, 193, 66, 0.3)",
+    "selection-text": "#f7f7f7",
+    "disabled-bg": "rgba(255, 255, 255, 0.05)",
+    "disabled-text": "rgba(255, 255, 255, 0.4)",
+    "focus-ring": "rgba(88, 193, 66, 0.5)",
+    "button-primary": "#f7f7f7",
+    "button-primary-hover": "#e0e0e0",
+    "button-secondary": "rgb(195, 200, 194)",
+    "button-secondary-hover": "rgb(175, 180, 175)"
   }
 }
