@@ -17,6 +17,7 @@ import { RpcApi } from "@/app/store/wshclientapi";
 import { makeBuilderRouteId, makeTabRouteId } from "@/app/store/wshrouter";
 import { initWshrpc, TabRpcClient } from "@/app/store/wshrpcutil";
 import { BuilderApp } from "@/builder/builder-app";
+import { initializeThemeOnStartup } from "@/app/view/waveconfig/themevisual";
 import { getLayoutModelForStaticTab } from "@/layout/index";
 import { countersClear, countersPrint } from "@/store/counters";
 import {
@@ -160,6 +161,8 @@ async function initWave(initOpts: WaveInitOpts) {
     const globalWS = initWshrpc(makeTabRouteId(initOpts.tabId));
     (window as any).globalWS = globalWS;
     (window as any).TabRpcClient = TabRpcClient;
+
+    await initializeThemeOnStartup();
 
     // ensures client/window/workspace are loaded into the cache before rendering
     try {

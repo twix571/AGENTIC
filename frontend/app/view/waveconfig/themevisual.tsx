@@ -2,10 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { WaveConfigViewModel } from "@/app/view/waveconfig/waveconfig-model";
+import { getApi } from "@/app/store/global";
 import { globalStore } from "@/app/store/jotaiStore";
 import { cn } from "@/util/util";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { base64ToString, stringToBase64 } from "@/util/util";
+import { RpcApi } from "@/app/store/wshclientapi";
+import { TabRpcClient } from "@/app/store/wshrpcutil";
 
 interface ColorInputProps {
   label: string;
@@ -15,7 +19,7 @@ interface ColorInputProps {
 }
 
 const ColorInput = memo(({ label, value, onChange, description }: ColorInputProps) => {
-  const [localValue, setLocalValue] = useAtom(atom(value));
+  const [localValue, setLocalValue] = useAtom(value);
   const isColorInputMode = useRef<boolean>(true);
 
   useEffect(() => {
@@ -139,6 +143,46 @@ const rgbToHex = (value: string): string => {
   return "#000000";
 };
 
+// Initialize theme from config file on app startup
+export async function initializeThemeOnStartup() {
+  try {
+    const configDir = getApi().getConfigDir();
+    const themeFilePath = `${configDir}/theme.json`;
+
+    try {
+      const fileData = await RpcApi.FileInfoCommand(TabRpcClient, {
+        info: { path: themeFilePath },
+      });
+
+      // If file doesn't exist, use defaults
+      if (fileData.notfound) {
+        return;
+      }
+
+      // Read the file content
+      const contentData = await RpcApi.FileReadCommand(TabRpcClient, {
+        info: { path: themeFilePath },
+      });
+
+      const content = contentData?.data64 ? base64ToString(contentData.data64) : "";
+
+      // Parse and apply the theme
+      if (content && content.trim()) {
+        const parsed = JSON.parse(content);
+        if (parsed.colors && typeof parsed.colors === "object") {
+          const themeColors = { ...defaultColors, ...parsed.colors } as ThemeColors;
+          applyThemeFromConfig(themeColors);
+          console.log("Theme initialized from config file:", themeFilePath);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to initialize theme on startup:", err);
+    }
+  } catch (err) {
+    console.warn("Failed to initialize theme:", err);
+  }
+}
+
 interface ThemeVisualContentProps {
   model: WaveConfigViewModel;
 }
@@ -204,6 +248,25 @@ const colorDescriptions: Record<keyof ThemeColors, string> = {
   border: "Border and divider color",
   "modal-bg": "Modal/dialog background",
   "highlight-bg": "Highlighted item background",
+};
+
+// Helper function to apply theme colors to CSS variables immediately
+export const applyThemeFromConfig = (themeConfig: ThemeColors) => {
+  document.documentElement.style.setProperty("--main-bg-color", themeConfig.background);
+  document.documentElement.style.setProperty("--main-text-color", themeConfig.foreground);
+  document.documentElement.style.setProperty("--secondary-text-color", themeConfig.secondary);
+  document.documentElement.style.setProperty("--grey-text-color", themeConfig.muted);
+  document.documentElement.style.setProperty("--panel-bg-color", themeConfig.panel);
+  document.documentElement.style.setProperty("--modal-bg-color", themeConfig["modal-bg"]);
+  document.documentElement.style.setProperty("--highlight-bg-color", themeConfig["highlight-bg"]);
+  document.documentElement.style.setProperty("--hover-bg-color", themeConfig["hover-bg"]);
+  document.documentElement.style.setProperty("--border-color", themeConfig.border);
+  document.documentElement.style.setProperty("--accent-color", themeConfig.accent);
+  document.documentElement.style.setProperty("--form-element-primary-color", themeConfig.accent);
+  document.documentElement.style.setProperty("--toggle-checked-bg-color", themeConfig.accent);
+  document.documentElement.style.setProperty("--error-color", themeConfig.error);
+  document.documentElement.style.setProperty("--warning-color", themeConfig.warning);
+  document.documentElement.style.setProperty("--success-color", themeConfig.success);
 };
 
 export const ThemeVisualContent = memo(({ model }: ThemeVisualContentProps) => {
