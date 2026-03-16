@@ -7,6 +7,8 @@ import * as readline from "readline";
 import { WebServerEndpointVarName, WSServerEndpointVarName } from "../frontend/util/endpoints";
 import { AuthKey, WaveAuthKeyEnv } from "./authkey";
 import { setForceQuit, setUserConfirmedQuit } from "./emain-activity";
+import { getWaveConfigDir } from "./emain-platform";
+import dotenv from "dotenv";
 import {
     getElectronAppResourcesPath,
     getElectronAppUnpackedBasePath,
@@ -59,6 +61,8 @@ export function runWaveSrv(handleWSEvent: (evtMsg: WSEventType) => void): Promis
         pResolve = argResolve;
         pReject = argReject;
     });
+    const configDir = getWaveConfigDir();
+    dotenv.config({ path: configDir + "/.env", override: true });
     const envCopy = { ...process.env };
     const xdgCurrentDesktop = getXdgCurrentDesktop();
     if (xdgCurrentDesktop != null) {

@@ -8,6 +8,7 @@ import type { TabModel } from "@/app/store/tab-model";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { SecretsContent } from "@/app/view/waveconfig/secretscontent";
+import { ThemeVisualContent } from "@/app/view/waveconfig/themevisual";
 import { WaveConfigView } from "@/app/view/waveconfig/waveconfig";
 import { isWindows } from "@/util/platformutil";
 import { base64ToString, stringToBase64 } from "@/util/util";
@@ -66,6 +67,29 @@ function validateWaveAiJson(parsed: any): ValidationResult {
     return { success: true };
 }
 
+function validateThemeJson(parsed: any): ValidationResult {
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+        return { error: "Theme config must be an object" };
+    }
+
+    if ("colors" in parsed) {
+        const colors = parsed.colors;
+        if (typeof colors !== "object" || colors === null || Array.isArray(colors)) {
+            return { error: "'colors' must be an object" };
+        }
+
+        // Validate that all color values are strings
+        const colorKeys = Object.keys(colors);
+        for (const key of colorKeys) {
+            if (typeof colors[key] !== "string") {
+                return { error: `Invalid color value for "${key}": must be a string` };
+            }
+        }
+    }
+
+    return { success: true };
+}
+
 const configFiles: ConfigFile[] = [
     {
         name: "General",
@@ -98,6 +122,16 @@ const configFiles: ConfigFile[] = [
         validator: validateWaveAiJson,
         hasJsonView: true,
         // visualComponent: WaveAIVisualContent,
+    },
+    {
+        name: "Theme",
+        path: "theme.json",
+        language: "json",
+        description: "Application colors and theme",
+        docsUrl: "https://docs.waveterm.dev/customization",
+        validator: validateThemeJson,
+        hasJsonView: true,
+        visualComponent: ThemeVisualContent,
     },
     {
         name: "Tab Backgrounds",
@@ -385,6 +419,11 @@ export class WaveConfigViewModel implements ViewModel {
                 );
             } finally {
                 globalStore.set(this.isSavingAtom, false);
+            }
+
+            // Reload file to trigger any observers and ensure UI reflects changes
+            if (selectedFile.path === "theme.json") {
+                this.loadFile(selectedFile);
             }
         } catch (err) {
             globalStore.set(this.validationErrorAtom, `Invalid JSON: ${err.message || String(err)}`);

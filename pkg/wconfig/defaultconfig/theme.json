@@ -1,0 +1,22 @@
+{
+  "colors": {
+    "background": "rgb(34, 34, 34)",
+    "foreground": "#f7f7f7",
+    "primary": "#f7f7f7",
+    "secondary": "rgb(195, 200, 194)",
+    "muted": "rgb(140, 145, 140)",
+    "muted-foreground": "rgb(195, 200, 194)",
+    "accent": "rgb(88, 193, 66)",
+    "accent-hover": "rgb(118, 223, 96)",
+    "accent-bg": "rgba(88, 193, 66, 0.5)",
+    "error": "rgb(229, 77, 46)",
+    "warning": "rgb(224, 185, 86)",
+    "success": "rgb(78, 154, 6)",
+    "panel": "rgba(31, 33, 31, 0.5)",
+    "hover": "rgba(255, 255, 255, 0.1)",
+    "hover-bg": "rgba(255, 255, 255, 0.2)",
+    "border": "rgba(255, 255, 255, 0.16)",
+    "modal-bg": "#232323",
+    "highlight-bg": "rgba(255, 255, 255, 0.2)"
+  }
+}

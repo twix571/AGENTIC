@@ -317,6 +317,7 @@ type FullConfigType struct {
 	Connections    map[string]ConnKeywords        `json:"connections"`
 	Bookmarks      map[string]WebBookmark         `json:"bookmarks"`
 	WaveAIModes    map[string]AIModeConfigType    `json:"waveai"`
+	Theme          ThemeConfigType                `json:"theme"`
 	ConfigErrors   []ConfigError                  `json:"configerrors" configfile:"-"`
 }
 
@@ -889,6 +890,31 @@ type TermThemeType struct {
 	SelectionBackground string  `json:"selectionBackground"`
 	Background          string  `json:"background"`
 	Cursor              string  `json:"cursor"`
+}
+
+type ThemeConfigType struct {
+	Colors ThemeColorsType `json:"colors"`
+}
+
+type ThemeColorsType struct {
+	Background      string `json:"background"`
+	Foreground      string `json:"foreground"`
+	Primary         string `json:"primary"`
+	Secondary       string `json:"secondary"`
+	Muted           string `json:"muted"`
+	MutedForeground string `json:"muted-foreground"`
+	Accent          string `json:"accent"`
+	AccentHover     string `json:"accent-hover"`
+	AccentBg        string `json:"accent-bg"`
+	Error           string `json:"error"`
+	Warning         string `json:"warning"`
+	Success         string `json:"success"`
+	Panel           string `json:"panel"`
+	Hover           string `json:"hover"`
+	HoverBg         string `json:"hover-bg"`
+	Border          string `json:"border"`
+	ModalBg         string `json:"modal-bg"`
+	HighlightBg     string `json:"highlight-bg"`
 }
 
 // CountCustomWidgets returns the number of custom widgets the user has defined.

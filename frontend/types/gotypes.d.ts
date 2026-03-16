@@ -981,6 +981,7 @@ declare global {
         connections: {[key: string]: ConnKeywords};
         bookmarks: {[key: string]: WebBookmark};
         waveai: {[key: string]: AIModeConfigType};
+        theme: ThemeConfigType;
         configerrors: ConfigError[];
     };
 
@@ -1630,6 +1631,33 @@ declare global {
         selectionBackground: string;
         background: string;
         cursor: string;
+    };
+
+    // wconfig.ThemeColorsType
+    type ThemeColorsType = {
+        background: string;
+        foreground: string;
+        primary: string;
+        secondary: string;
+        muted: string;
+        muted-foreground: string;
+        accent: string;
+        accent-hover: string;
+        accent-bg: string;
+        error: string;
+        warning: string;
+        success: string;
+        panel: string;
+        hover: string;
+        hover-bg: string;
+        border: string;
+        modal-bg: string;
+        highlight-bg: string;
+    };
+
+    // wconfig.ThemeConfigType
+    type ThemeConfigType = {
+        colors: ThemeColorsType;
     };
 
     // wshrpc.TimeSeriesData
