@@ -402,12 +402,24 @@ func (bc *ShellController) setupAndStartShellProcess(logCtx context.Context, rc 
 	if bc.ControllerType == BlockController_Shell {
 		cmdOpts.Interactive = true
 		cmdOpts.Login = true
-		cmdOpts.Cwd = blockMeta.GetString(waveobj.MetaKey_CmdCwd, "")
+		// Priority: term:defaultcwd > term:projectdefaultcwd > cmd:cwd (shell-reported)
+		// User-defined defaults should take precedence over dynamically reported shell CWD
+		cmdOpts.Cwd = blockMeta.GetString(waveobj.MetaKey_TermDefaultCwd, "")
+		blocklogger.Debugf(logCtx, "[conndebug] shell cwd from term:defaultcwd: %q\n", cmdOpts.Cwd)
+		if cmdOpts.Cwd == "" {
+			cmdOpts.Cwd = wconfig.GetWatcher().GetFullConfig().Settings.TermProjectDefaultCwd
+			blocklogger.Debugf(logCtx, "[conndebug] shell cwd from term:projectdefaultcwd: %q\n", cmdOpts.Cwd)
+		}
+		if cmdOpts.Cwd == "" {
+			cmdOpts.Cwd = blockMeta.GetString(waveobj.MetaKey_CmdCwd, "")
+			blocklogger.Debugf(logCtx, "[conndebug] shell cwd from cmd:cwd: %q\n", cmdOpts.Cwd)
+		}
 		if cmdOpts.Cwd != "" {
 			cwdPath, err := wavebase.ExpandHomeDir(cmdOpts.Cwd)
 			if err != nil {
 				return nil, err
 			}
+			blocklogger.Debugf(logCtx, "[conndebug] shell final cwd after ExpandHomeDir: %q\n", cwdPath)
 			cmdOpts.Cwd = cwdPath
 		}
 	} else if bc.ControllerType == BlockController_Cmd {
@@ -423,6 +435,15 @@ func (bc *ShellController) setupAndStartShellProcess(logCtx context.Context, rc 
 	var shellProc *shellexec.ShellProc
 	swapToken := makeSwapToken(ctx, logCtx, bc.BlockId, blockMeta, remoteName, connUnion.ShellType)
 	cmdOpts.SwapToken = swapToken
+	if cmdOpts.Cwd != "" && connUnion.ShellType == shellutil.ShellType_pwsh {
+		setLocScript := fmt.Sprintf("Set-Location -LiteralPath %s\n", shellutil.HardQuotePowerShell(cmdOpts.Cwd))
+		if swapToken.ScriptText != "" {
+			swapToken.ScriptText = setLocScript + swapToken.ScriptText
+		} else {
+			swapToken.ScriptText = setLocScript
+		}
+		blocklogger.Debugf(logCtx, "[conndebug] injected Set-Location for pwsh cwd: %q\n", cmdOpts.Cwd)
+	}
 	blocklogger.Debugf(logCtx, "[conndebug] created swaptoken: %s\n", swapToken.Token)
 	if connUnion.ConnType == ConnType_Wsl {
 		wslConn := connUnion.WslConn
