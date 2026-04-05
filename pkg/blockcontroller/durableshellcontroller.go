@@ -20,7 +20,6 @@ import (
 	"github.com/wavetermdev/waveterm/pkg/utilds"
 	"github.com/wavetermdev/waveterm/pkg/wavebase"
 	"github.com/wavetermdev/waveterm/pkg/waveobj"
-	"github.com/wavetermdev/waveterm/pkg/wconfig"
 	"github.com/wavetermdev/waveterm/pkg/wps"
 	"github.com/wavetermdev/waveterm/pkg/wshrpc"
 	"github.com/wavetermdev/waveterm/pkg/wshrpc/wshclient"
@@ -228,15 +227,7 @@ func (dsc *DurableShellController) startNewJob(ctx context.Context, blockMeta wa
 		termSize = rtOpts.TermSize
 	}
 	cmdStr := blockMeta.GetString(waveobj.MetaKey_Cmd, "")
-	// Priority: term:defaultcwd > term:projectdefaultcwd > cmd:cwd (shell-reported)
-	// User-defined defaults should take precedence over dynamically reported shell CWD
-	cwd := blockMeta.GetString(waveobj.MetaKey_TermDefaultCwd, "")
-	if cwd == "" {
-		cwd = wconfig.GetWatcher().GetFullConfig().Settings.TermProjectDefaultCwd
-	}
-	if cwd == "" {
-		cwd = blockMeta.GetString(waveobj.MetaKey_CmdCwd, "")
-	}
+	cwd := blockMeta.GetString(waveobj.MetaKey_CmdCwd, "")
 	opts, err := remote.ParseOpts(connName)
 	if err != nil {
 		return "", fmt.Errorf("invalid ssh remote name (%s): %w", connName, err)
