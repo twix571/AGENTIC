@@ -19,10 +19,11 @@
         "Chrome >= 128"
     ],
     "scripts": {
-        "dev": "electron-vite dev",
+        "dev": "npm run build:server && electron-vite dev",
         "start": "electron-vite preview",
         "build:dev": "electron-vite build --mode development",
         "build:prod": "electron-vite build --mode production",
+        "build:server": "node build-server.js",
         "coverage": "vitest run --coverage",
         "test": "vitest",
         "postinstall": "node ./postinstall.cjs"
