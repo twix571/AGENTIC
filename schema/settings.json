@@ -168,12 +168,6 @@
         "term:durable": {
           "type": "boolean"
         },
-        "term:projectdefaultcwd": {
-          "type": "string"
-        },
-        "term:showcwdintab": {
-          "type": "boolean"
-        },
         "editor:minimapenabled": {
           "type": "boolean"
         },

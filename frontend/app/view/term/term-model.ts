@@ -850,20 +850,6 @@ export class TermViewModel implements ViewModel {
 
         menu.push({ type: "separator" });
 
-        menu.push({
-            label: "Restart Panel",
-            click: () => fireAndForget(() => this.forceRestartController()),
-        });
-
-        menu.push({ type: "separator" });
-
-        menu.push({
-            label: "Set Default Path...",
-            click: () => this.openSetDefaultPathModal(),
-        });
-
-        menu.push({ type: "separator" });
-
         const settingsItems = this.getSettingsMenuItems();
         menu.push(...settingsItems);
 
@@ -1312,41 +1298,6 @@ export class TermViewModel implements ViewModel {
             });
         }
         return fullMenu;
-    }
-
-    openSetDefaultPathModal(): void {
-        const blockData = globalStore.get(this.blockAtom);
-        const currentCwd = blockData?.meta?.["cmd:cwd"] || "";
-        const existingDefaultCwd = blockData?.meta?.["term:defaultcwd"] || "";
-
-        modalsModel.pushModal("SetDefaultPathModal", {
-            currentCwd,
-            existingDefaultCwd,
-            onConfirm: (path: string, isProjectLevel: boolean) => {
-                if (isProjectLevel) {
-                    this.setProjectDefaultPath(path);
-                } else {
-                    this.setBlockDefaultPath(path);
-                }
-            },
-        });
-    }
-
-    setBlockDefaultPath(path: string): void {
-        fireAndForget(async () => {
-            await RpcApi.SetMetaCommand(TabRpcClient, {
-                oref: WOS.makeORef("block", this.blockId),
-                meta: { "term:defaultcwd": path },
-            });
-            await this.forceRestartController();
-        });
-    }
-
-    setProjectDefaultPath(path: string): void {
-        fireAndForget(async () => {
-            await RpcApi.SetConfigCommand(TabRpcClient, { "term:projectdefaultcwd": path });
-            await this.forceRestartController();
-        });
     }
 }
 

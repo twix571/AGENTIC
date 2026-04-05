@@ -358,11 +358,6 @@ function getDefaultNewBlockDef(): BlockDef {
             controller: "shell",
         },
     };
-    // Include project default cwd from settings
-    const projectDefaultCwd = globalStore.get(getSettingsKeyAtom("term:projectdefaultcwd"));
-    if (projectDefaultCwd) {
-        termBlockDef.meta["term:projectdefaultcwd"] = projectDefaultCwd;
-    }
     const layoutModel = getLayoutModelForStaticTab();
     const focusedNode = globalStore.get(layoutModel.focusedNode);
     if (focusedNode != null) {
