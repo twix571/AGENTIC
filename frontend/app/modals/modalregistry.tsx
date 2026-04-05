@@ -9,7 +9,6 @@ import { DeleteFileModal, PublishAppModal, RenameFileModal } from "@/builder/bui
 import { SetSecretDialog } from "@/builder/tabs/builder-secrettab";
 import { AboutModal } from "./about";
 import { UserInputModal } from "./userinputmodal";
-import { SetDefaultPathModal } from "./messagemodal";
 
 const modalRegistry: { [key: string]: React.ComponentType<any> } = {
     [NewInstallOnboardingModal.displayName || "NewInstallOnboardingModal"]: NewInstallOnboardingModal,
@@ -22,7 +21,6 @@ const modalRegistry: { [key: string]: React.ComponentType<any> } = {
     [RenameFileModal.displayName || "RenameFileModal"]: RenameFileModal,
     [DeleteFileModal.displayName || "DeleteFileModal"]: DeleteFileModal,
     [SetSecretDialog.displayName || "SetSecretDialog"]: SetSecretDialog,
-    [SetDefaultPathModal.displayName || "SetDefaultPathModal"]: SetDefaultPathModal,
 };
 
 export const getModalComponent = (key: string): React.ComponentType<any> | undefined => {
