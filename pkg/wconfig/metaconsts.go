@@ -59,8 +59,6 @@ const (
 	ConfigKey_TermBellIndicator              = "term:bellindicator"
 	ConfigKey_TermOsc52                      = "term:osc52"
 	ConfigKey_TermDurable                    = "term:durable"
-	ConfigKey_TermProjectDefaultCwd          = "term:projectdefaultcwd"
-	ConfigKey_TermShowCwdInTab               = "term:showcwdintab"
 
 	ConfigKey_EditorMinimapEnabled           = "editor:minimapenabled"
 	ConfigKey_EditorStickyScrollEnabled      = "editor:stickyscrollenabled"

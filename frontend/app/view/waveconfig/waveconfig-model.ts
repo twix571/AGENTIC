@@ -7,8 +7,6 @@ import { globalStore } from "@/app/store/jotaiStore";
 import type { TabModel } from "@/app/store/tab-model";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
-import { waveEventSubscribeSingle } from "@/app/store/wps";
-import { GeneralVisualContent } from "@/app/view/waveconfig/generalvisual";
 import { SecretsContent } from "@/app/view/waveconfig/secretscontent";
 import { ThemeVisualContent } from "@/app/view/waveconfig/themevisual";
 import { WaveConfigView } from "@/app/view/waveconfig/waveconfig";
@@ -99,7 +97,6 @@ const configFiles: ConfigFile[] = [
         language: "json",
         docsUrl: "https://docs.waveterm.dev/config",
         hasJsonView: true,
-        visualComponent: GeneralVisualContent,
     },
     {
         name: "Connections",
@@ -246,28 +243,8 @@ export class WaveConfigViewModel implements ViewModel {
         this.newSecretValueAtom = atom<string>("");
         this.storageBackendErrorAtom = atom<string | null>(null) as PrimitiveAtom<string | null>;
 
-        this.configUnsubFn = waveEventSubscribeSingle({
-            eventType: "config",
-            handler: () => {
-                this.reloadCurrentFileIfNoChanges();
-            },
-        });
-
         this.checkPresetsJsonExists();
         this.initialize();
-    }
-
-    private configUnsubFn: () => void;
-
-    async reloadCurrentFileIfNoChanges() {
-        const hasChanges = globalStore.get(this.hasEditedAtom);
-        if (hasChanges) {
-            return;
-        }
-        const selectedFile = globalStore.get(this.selectedFileAtom);
-        if (selectedFile && !selectedFile.isSecrets) {
-            this.loadFile(selectedFile);
-        }
     }
 
     async checkPresetsJsonExists() {
@@ -655,9 +632,5 @@ export class WaveConfigViewModel implements ViewModel {
             return true;
         }
         return false;
-    }
-
-    dispose() {
-        this.configUnsubFn?.();
     }
 }
